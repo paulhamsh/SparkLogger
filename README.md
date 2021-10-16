@@ -112,6 +112,8 @@ And for IOS:
   pSender_sp->writeValue(preset_spk_cmd, preset_cmd_size);
   pCharacteristic_send->setValue(preset_spk_cmd, preset_cmd_size);
   pCharacteristic_send->notify(true);
+  
+And remove the code from printhdr() and printval() so they do nothing - which will stop the logging.   
 ```
   
 
