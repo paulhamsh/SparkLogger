@@ -12,16 +12,16 @@ Ensure serial monitor is on!
 
 Works with M5Stack Core2 and Heltec Wifi - change the #define to select the board
 
-Things in <<  >> are *likely* to be commands - unless they are part of a resposne to a preset request (0x0201) , in which case they are rubbish
-So the example below goes:
-022f, 032f
-022f, 032f
-0211, 0311
-0223, 0323
-022a, 032a
-0210, 0310
-0201, 0301
-
+Things in <<  >> are *likely* to be commands - unless they are part of a resposne to a preset request (0x0201) , in which case they are rubbish   
+So the example below goes:   
+022f, 032f   
+022f, 032f   
+0211, 0311   
+0223, 0323   
+022a, 032a   
+0210, 0310   
+0201, 0301   
+   
 Output like this:
 
 ```
