@@ -74,4 +74,51 @@ Write to app:       01 FE 00 00 41 FF 6A 00 00 00 00 00 00 00 00 00
 
 ```
 
+If you want to change it to just do passthru and have ability to command the Spark, add:   
+
+```
+const int preset_cmd_size = 26;
+
+byte preset_spk_cmd[] = {
+  0x01, 0xFE, 0x00, 0x00,
+  0x53, 0xFE, 0x1A, 0x00,
+  0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00,
+  0xF0, 0x01, 0x24, 0x00,
+  0x01, 0x38, 0x00, 0x00,
+  0x00, 0xF7
+};
+
+byte preset_app_cmd[] = {
+  0x01, 0xFE, 0x00, 0x00,
+  0x41, 0xFF, 0x17, 0x00,
+  0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00,
+  0xF0, 0x01, 0x24, 0x00,
+  0x03, 0x38, 0x00, 0x00,
+  0x00, 0xF7
+};
+
+And on some trigger....
+  curr_preset = 1   // put your value here
+  preset_spk_cmd[preset_cmd_size-2] = curr_preset;
+  preset_app_cmd[preset_cmd_size-2] = curr_preset;
+
+And then for Android:   
+  pSender_sp->writeValue(preset_spk_cmd, preset_cmd_size);
+  BTApp.write(preset_app_cmd, preset_cmd_size);
+  
+And for IOS:
+  pSender_sp->writeValue(preset_spk_cmd, preset_cmd_size);
+  pCharacteristic_send->setValue(preset_spk_cmd, preset_cmd_size);
+  pCharacteristic_send->notify(true);
+```
+  
+
+  
+  
+
+
+```
+
 
