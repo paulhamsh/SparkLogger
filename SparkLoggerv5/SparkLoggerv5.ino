@@ -75,7 +75,8 @@ void printval(int a)
 void printhdr(char *s)
 {
   Serial.println();
-  Serial.print(s);
+  Serial.println(s);
+  Serial.print("                    ");
   scrpos = 0;
 }
 
@@ -121,7 +122,7 @@ class CharacteristicCallbacks: public BLECharacteristicCallbacks {
 
 
 static CharacteristicCallbacks chrCallbacks_s, chrCallbacks_r;
-
+bool use_ble;
 
 
 void setup() {
@@ -131,14 +132,14 @@ void setup() {
   M5.begin();
   M5.Lcd.fillScreen(TFT_BLACK);
   M5.Lcd.setTextSize(4);
-  M5.Lcd.println(" IOS Logger");
-  M5.Lcd.println("-------------");
+  M5.Lcd.println("Spark Logger");
+  M5.Lcd.println("------------");
   Serial.println("Started");
   M5.Lcd.setTextSize(3);
 #else
   Heltec.begin(true /*DisplayEnable Enable*/, false /*LoRa Enable*/, true /*Serial Enable*/);
   Heltec.display->clear();
-  Heltec.display->drawString(0, 0, "   Logger");
+  Heltec.display->drawString(0, 0, "pPark Logger");
   Heltec.display->display();
 #endif
 
@@ -147,6 +148,8 @@ void setup() {
   to_app_pos = 0;
   to_amp_pos = 0;
   scrpos = 0;
+
+  use_ble = true;
 
   
   // Create server to act as Spark
@@ -184,8 +187,6 @@ void setup() {
     pResults = pScan->start(4);
     BLEUUID SpServiceUuid(C_SERVICE);
 
-
-    Serial.println("------------------------------");
     for(i = 0; i < pResults.getCount()  && (!connected_sp); i++) {
       device = pResults.getDevice(i);
 
@@ -252,16 +253,35 @@ void loop() {
 // max size 0xad, each block always end in 0x7f
 
   if (!app_to_amp.is_empty()) {
+    use_ble = true;
     app_to_amp.get(&b);
     to_amp_buf[to_amp_pos++] = b;      
     if (b == 0xf7) {
       pSender_sp->writeValue(to_amp_buf, to_amp_pos, false);
 
-      printhdr("Write to spark:     ");
+      printhdr("Write to spark (BLE App):     ");
       for (i=0; i<to_amp_pos; i++) {
         printval(to_amp_buf[i]);
       }
       to_amp_pos = 0;
+    }
+  }
+
+  
+  if (BTApp.available()) {
+    use_ble = true;
+    while (BTApp.available()) {
+      b = BTApp.read();
+      to_amp_buf[to_amp_pos++] = b;     
+      if (b == 0xf7) {
+        pSender_sp->writeValue(to_amp_buf, to_amp_pos, false);
+
+        printhdr("Write to spark (Classic BT App):     ");
+          for (i=0; i<to_amp_pos; i++) {
+            printval(to_amp_buf[i]);
+          }
+        to_amp_pos = 0;
+      }
     }
   }
 
@@ -275,10 +295,20 @@ void loop() {
   
   if ((amp_to_app.is_empty() && to_app_pos > 0)   // no more but there is something to send
        || to_app_pos >= 0x6a) {                   // block full so need to send
-    pCharacteristic_send->setValue(to_app_buf, to_app_pos);
-    pCharacteristic_send->notify(true);
+    
+    if (use_ble) {
+      pCharacteristic_send->setValue(to_app_buf, to_app_pos);
+      pCharacteristic_send->notify(true);
+    } 
+    else {
+      BTApp.write(to_app_buf, to_app_pos);
+    }
 
-    printhdr("Write to app:       ");
+    if (use_ble) 
+      printhdr("Write to app (BLE):       ");
+    else
+      printhdr("Write to app (Classic BT):       ");
+      
     for (i=0; i < to_app_pos; i++) {
       printval(to_app_buf[i]);
     }
