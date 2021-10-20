@@ -1,7 +1,7 @@
-## SparkLogger
+# SparkLogger
 Log commands between Spark app and amp
 
-# UPDATE 20/10/21
+## UPDATE 20/10/21
 
 Now can handle either BLE or classic bluetooth to the app in a single version :-)
 
