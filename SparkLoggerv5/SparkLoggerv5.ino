@@ -269,7 +269,7 @@ void loop() {
 
   
   if (BTApp.available()) {
-    use_ble = true;
+    use_ble = false;
     while (BTApp.available()) {
       b = BTApp.read();
       to_amp_buf[to_amp_pos++] = b;     
