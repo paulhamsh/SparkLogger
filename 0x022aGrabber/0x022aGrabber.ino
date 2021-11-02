@@ -191,7 +191,7 @@ void loop() {
     if (b == 0xf7) {
       pSender_sp->writeValue(to_amp_buf, to_amp_pos, false);
 
-      Serial.print("Write to spark (BLE App):     ");
+      Serial.print("Write to spark (BLE App):        ");
       Serial.print(to_amp_buf[20], HEX);
       Serial.print(" ");
       Serial.println(to_amp_buf[21], HEX);
@@ -208,7 +208,7 @@ void loop() {
       if (b == 0xf7) {
         pSender_sp->writeValue(to_amp_buf, to_amp_pos, false);
 
-        Serial.print("Write to spark (Classic BT App):     ");
+        Serial.print("Write to spark (Classic BT App): ");
         Serial.print(to_amp_buf[20], HEX);
         Serial.print(" ");
         Serial.println(to_amp_buf[21], HEX);
@@ -228,12 +228,13 @@ void loop() {
   if ((amp_to_app.is_empty() && to_app_pos > 0)   // no more but there is something to send
        || to_app_pos >= 0x6a) {                   // block full so need to send
 
-    if (to_amp_buf[20] == 0x02 && to_amp_buf[21] == 0x2a) {
-      Serial.print("0x022a data:   ");
-      for (i=0; i<to_amp_pos; i++) {
-        if (to_amp_buf[i] <16) Serial.print("0");
-        Serial.print(to_amp_buf[i], HEX);
+    if (to_app_buf[20] == 0x03 && to_app_buf[21] == 0x2a) {
+      Serial.println("0x022a data:   ");
+      for (i=0; i<to_app_pos; i++) {
+        if (to_app_buf[i] <16) Serial.print("0");
+        Serial.print(to_app_buf[i], HEX);
         Serial.print(" ");
+        if (i % 16 == 15) Serial.println();
       }            
       Serial.println();
     }
@@ -248,7 +249,7 @@ void loop() {
     }
 
     if (use_ble) 
-      Serial.print("Write to app (BLE):       ");
+      Serial.print("Write to app (BLE):              ");
     else
       Serial.print("Write to app (Classic BT):       ");
    
